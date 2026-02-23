@@ -9,7 +9,7 @@ source.include_exts = py,png,jpg,kv,atlas
 
 version = 1.0
 
-requirements = python3,kivy,kivymd,plyer,bcrypt,sqlite3
+requirements = python3,kivy,kivymd,plyer,reportlab,bcrypt,supabase,requests
 
 orientation = portrait
 
