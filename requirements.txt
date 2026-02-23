@@ -3,3 +3,5 @@ kivymd
 plyer
 reportlab
 bcrypt
+supabase
+requests
