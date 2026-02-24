@@ -11,8 +11,20 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      # 🔹 Checkout
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      # 🔹 Cache (acelera builds futuras)
+      - name: Cache Buildozer & Gradle
+        uses: actions/cache@v3
+        with:
+          path: |
+            .buildozer
+            ~/.gradle
+          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            ${{ runner.os }}-buildozer-
 
       # 🔹 Python 3.10
       - name: Set up Python
@@ -20,7 +32,7 @@ jobs:
         with:
           python-version: '3.10'
 
-      # 🔹 Forçar Java 17 corretamente
+      # 🔹 Java 17 (necessário para Android recente)
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
@@ -38,29 +50,34 @@ jobs:
             libncursesw5-dev libtinfo5 \
             cmake libffi-dev libssl-dev
 
+      # 🔹 Atualizar pip
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
 
-      # 🔹 Buildozer + Cython fix
+      # 🔹 Instalar Buildozer + fix Cython
       - name: Install Buildozer
         run: |
           pip install buildozer==1.5.0
           pip install "Cython<3"
           pip install virtualenv
 
+      # 🔹 Configurar Gradle (CORREÇÃO DO ERRO)
+      - name: Configure Gradle
+        run: |
+          mkdir -p ~/.gradle
+          echo "org.gradle.jvmargs=-Xmx2048m" >> ~/.gradle/gradle.properties
+          echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
+          echo "org.gradle.parallel=false" >> ~/.gradle/gradle.properties
+
       # 🔹 Aceitar licenças Android
       - name: Accept Android licenses
-        run: yes | buildozer android update
-
-      # 🔹 Limitar uso de memória (evita crash do Gradle)
-      - name: Limit parallel jobs
-        run: echo "org.gradle.jvmargs=-Xmx2048m" >> ~/.gradle/gradle.properties
+        run: yes | buildozer android update || true
 
       # 🔹 Clean
       - name: Clean previous build
         run: buildozer android clean
 
-      # 🔹 Build
+      # 🔹 Build APK
       - name: Build APK
         run: buildozer android debug
 
