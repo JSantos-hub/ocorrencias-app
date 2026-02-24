@@ -24,7 +24,7 @@ android.ndk = 25b
 android.ndk_api = 21
 
 android.accept_sdk_license = True
-android.archs = arm64-v8a, armeabi-v7a
+android.archs = arm64-v8a
 
 log_level = 2
 
